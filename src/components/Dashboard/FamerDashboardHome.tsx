@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function FarmerDashboardHome() {
   // Mock data
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     creditScore: 720,
     pendingLoans: 1,
     upcomingHarvests: 2,
@@ -22,7 +22,7 @@ function FarmerDashboardHome() {
 
   // Format date
   const formatDate = (dateString: string | number | Date) => {
-    const options:any = { year: 'numeric', month: 'short', day: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -105,7 +105,7 @@ function FarmerDashboardHome() {
         </div>
         <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
           <div className="text-sm">
-            <a href="#" className="font-medium text-primary hover:text-primary-dark">
+            <a href="#" className="font-medium text-blue-600 hover:text-blue-800">
               View all sales <span aria-hidden="true">&rarr;</span>
             </a>
           </div>

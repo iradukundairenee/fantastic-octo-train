@@ -1,6 +1,17 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/useAuth';
+
+// Type definitions
+interface User {
+  role: string;
+  // Add other user properties as needed
+}
+
+interface AuthContextType {
+  currentUser: User | null;
+  logout: () => void;
+}
 
 // Icons
 const HomeIcon = () => (
@@ -58,14 +69,51 @@ const ReportsIcon = () => (
   </svg>
 );
 
+const LogoutIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+  </svg>
+);
+
+const MenuToggleIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+
+const ChevronLeftIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+);
+
 function Sidebar() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout } = useAuth() as AuthContextType;
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = currentUser?.role === 'admin';
-  
+
+  // State for sidebar collapse and mobile sidebar visibility
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const toggleMobileSidebar = () => {
+    setIsMobileOpen(!isMobileOpen);
   };
 
   const farmerMenuItems = [
@@ -88,48 +136,137 @@ function Sidebar() {
 
   const menuItems = isAdmin ? adminMenuItems : farmerMenuItems;
 
-  return (
-    <div className="h-full flex flex-col bg-gray-800 text-white w-64 py-4 px-2">
-      <div className="px-4 py-2">
-        <h1 className="text-xl font-bold">Tech Crop</h1>
-        <p className="text-gray-400 text-sm">Farmer Credit System</p>
+  // Check if the path is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  // Desktop sidebar
+  const desktopSidebar = (
+    <div className={`hidden md:flex h-full flex-col bg-primary transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-64'}`}>
+      <div className={`flex items-center justify-between px-4 py-2 ${isCollapsed ? 'justify-center' : ''}`}>
+        {!isCollapsed ? <h1 className="text-xl font-bold">Tech Crop</h1>:<h1 className="text-xl font-bold">TC</h1>}
+        <button
+          onClick={toggleSidebar}
+          className="text-gray-700 hover:text-gray-900 focus:outline-none"
+        >
+          {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </button>
       </div>
-      
-      <div className="px-4 py-2 mb-6 border-b border-gray-700">
-        <p className="text-sm">Welcome,</p>
-        <p className="font-medium">{currentUser?.name || 'User'}</p>
-        <p className="text-xs text-gray-400 capitalize">{currentUser?.role || 'User'}</p>
-      </div>
-      
+
       <div className="flex-1">
-        <nav className="space-y-1 px-2">
+        <nav className="space-y-1 px-2 mt-5">
           {menuItems.map((item) => (
             <Link
               key={item.name}
               to={item.path}
-              className="group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-gray-700"
+              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-green-300 ${isActive(item.path) ? 'bg-green-300' : ''
+                } ${isCollapsed ? 'justify-center' : ''}`}
+              title={isCollapsed ? item.name : ''}
             >
-              <div className="mr-3 text-gray-300 group-hover:text-white">
+              <div className={isCollapsed ? '' : 'mr-3'}>
                 {item.icon}
               </div>
-              {item.name}
+              {!isCollapsed && item.name}
             </Link>
           ))}
         </nav>
       </div>
-      
-      <div className="px-4 py-2 border-t border-gray-700">
+
+      <div className={`px-4 py-2 border-t border-gray-700 ${isCollapsed ? 'flex justify-center' : ''}`}>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-gray-700"
+          className={`flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-green-300 ${isCollapsed ? 'w-auto' : 'w-full'
+            }`}
+          title={isCollapsed ? 'Logout' : ''}
         >
-          <svg className="mr-3 h-5 w-5 text-gray-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Logout
+          <div className={isCollapsed ? '' : 'mr-3'}>
+            <LogoutIcon />
+          </div>
+          {!isCollapsed && 'Logout'}
         </button>
       </div>
     </div>
+  );
+
+  // Mobile sidebar overlay
+  const mobileSidebar = (
+    <>
+      {/* Overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-20 bg-gray-600 bg-opacity-75 md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <div className={`md:hidden fixed inset-y-0 left-0 z-30 w-64 transition duration-300 transform bg-primary ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+        <div className="flex items-center justify-between px-4 py-2">
+          <h1 className="text-xl font-bold">Tech Crop</h1>
+          <button
+            onClick={toggleMobileSidebar}
+            className="text-gray-700 hover:text-gray-900 focus:outline-none"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex-1">
+          <nav className="space-y-1 px-2 mt-5">
+            {menuItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-green-300 ${isActive(item.path) ? 'bg-green-200' : ''
+                  }`}
+                onClick={() => setIsMobileOpen(false)}
+              >
+                <div className="mr-3">
+                  {item.icon}
+                </div>
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="px-4 py-2 border-t border-gray-700">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-green-300"
+          >
+            <div className="mr-3">
+              <LogoutIcon />
+            </div>
+            Logout
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      {desktopSidebar}
+
+      {/* Mobile Sidebar */}
+      {mobileSidebar}
+
+      {/* Mobile Toggle Button */}
+      <div className="fixed bottom-4 right-4 md:hidden z-10">
+        <button
+          onClick={toggleMobileSidebar}
+          className="p-2 rounded-full bg-primary shadow-lg focus:outline-none"
+        >
+          <MenuToggleIcon />
+        </button>
+      </div>
+    </>
   );
 }
 

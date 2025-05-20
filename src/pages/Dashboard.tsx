@@ -1,16 +1,21 @@
-import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import DashboardLayout from '../components/layout/DashboardLyout';
 import FarmerDashboardHome from '../components/Dashboard/FamerDashboardHome';
 import AdminDashboardHome from '../components/Dashboard/AdminDashboardHome';
 
+// Define the user type
+interface User {
+  role: string;
+  // Add other properties as needed
+}
 
 function Dashboard() {
- const { currentUser } = useAuth() as any;
+  // Type the currentUser properly instead of using "any"
+  const { currentUser } = useAuth() as { currentUser: User };
 
   const isAdmin = currentUser?.role === 'admin';
-  
+
   return (
     <DashboardLayout>
       <Routes>

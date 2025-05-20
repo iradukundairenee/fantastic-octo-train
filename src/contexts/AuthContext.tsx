@@ -1,31 +1,59 @@
-import { createContext, useState, useContext } from 'react';
+import {
+  createContext,
+  useState,
+  useEffect,
+  type ReactNode
+} from 'react';
 
-const AuthContext:any = createContext();
+// Define user type
+type User = {
+  phoneNumber: string;
+  role: string;
+  name: string;
+};
 
-export function useAuth() {
-  return useContext(AuthContext);
+// Define login credentials type
+type Credentials = {
+  phoneNumber: string;
+  pin: string;
+  role: string;
+};
+
+// Define context value type
+interface AuthContextType {
+  currentUser: User | null;
+  login: (credentials: Credentials) => boolean;
+  logout: () => boolean;
+  loading: boolean;
 }
 
-export function AuthProvider({ children }:any) {
-  const [currentUser, setCurrentUser] = useState(null);
+// Create context with default value
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Define provider props type
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  // Simulate checking if user is logged in
-  useState(() => {
-    const user:any = localStorage.getItem('user');
-    if (user) {
-      setCurrentUser(JSON.parse(user));
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
-  function login(credentials: { phoneNumber: any; pin: any; role: string; }) {
-    // For demo, we'll just check if phoneNumber and PIN are provided
-    if (credentials.phoneNumber && credentials.pin) {
-      const user = {
-        phoneNumber: credentials.phoneNumber,
-        role: credentials.role,
-        name: credentials.role === 'farmer' ? 'John Farmer' : 'Admin User'
+  function login(credentials: Credentials): boolean {
+    const { phoneNumber, pin, role } = credentials;
+    if (phoneNumber && pin) {
+      const user: User = {
+        phoneNumber,
+        role,
+        name: role === 'farmer' ? 'John Farmer' : 'Admin User',
       };
       localStorage.setItem('user', JSON.stringify(user));
       setCurrentUser(user);
@@ -34,17 +62,17 @@ export function AuthProvider({ children }:any) {
     return false;
   }
 
-  function logout() {
+  function logout(): boolean {
     localStorage.removeItem('user');
     setCurrentUser(null);
     return true;
   }
 
-  const value = {
+  const value: AuthContextType = {
     currentUser,
     login,
     logout,
-    loading
+    loading,
   };
 
   return (
@@ -53,3 +81,4 @@ export function AuthProvider({ children }:any) {
     </AuthContext.Provider>
   );
 }
+

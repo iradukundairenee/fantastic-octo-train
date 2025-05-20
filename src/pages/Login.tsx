@@ -1,25 +1,32 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
+
+// Define a type for login credentials
+interface LoginCredentials {
+  phoneNumber: string;
+  pin: string;
+  role: 'farmer' | 'admin'; // Restrict role choices
+}
 
 function Login() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [pin, setPin] = useState('');
-  const [role, setRole] = useState('farmer'); // Default role
+  const [role, setRole] = useState<'farmer' | 'admin'>('farmer'); // Default role selection
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     
     try {
       setError('');
       setLoading(true);
       
-      const success = login({ phoneNumber, pin, role });
+      const success = login({ phoneNumber, pin, role } as LoginCredentials);
       
       if (success) {
         navigate('/dashboard');
@@ -122,21 +129,13 @@ function Login() {
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-          
-          <div className="text-sm text-center">
-            <p className="text-gray-600">
-              Don't have an account? Contact your local agriculture office
-            </p>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
         </form>
       </div>
     </div>
