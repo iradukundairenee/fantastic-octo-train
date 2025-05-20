@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function FarmerDashboardHome() {
   // Mock data
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     creditScore: 720,
     pendingLoans: 1,
     upcomingHarvests: 2,

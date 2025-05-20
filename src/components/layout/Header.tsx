@@ -1,7 +1,7 @@
 import { useAuth } from '../../contexts/AuthContext';
 
 function Header() {
-  const { currentUser } = useAuth();
+const { currentUser } = useAuth() as any ;
   
   return (
     <header className="bg-white shadow">

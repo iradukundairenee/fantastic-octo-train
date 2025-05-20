@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -59,7 +59,7 @@ const ReportsIcon = () => (
 );
 
 function Sidebar() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout } = useAuth() as any;
   const navigate = useNavigate();
   const isAdmin = currentUser?.role === 'admin';
   

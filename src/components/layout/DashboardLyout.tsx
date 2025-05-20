@@ -1,9 +1,9 @@
-import { useAuth } from '../../contexts/AuthContext';
+// import { useAuth } from '../../contexts/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-function DashboardLayout({ children }) {
-  const { currentUser } = useAuth();
+function DashboardLayout({ children }:any) {
+  // const { currentUser } = useAuth() as any ;
   
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">

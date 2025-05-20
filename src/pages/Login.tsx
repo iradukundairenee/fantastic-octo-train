@@ -12,7 +12,7 @@ function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e:any) {
     e.preventDefault();
     
     try {
