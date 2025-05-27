@@ -2,6 +2,7 @@ import { useAuth } from '../../contexts/useAuth';
 
 interface HeaderProps {
   toggleMobileSidebar: () => void;
+  isSidebarCollapsed: boolean; // Add this property
 }
 
 interface User {
@@ -13,7 +14,7 @@ interface AuthContextType {
   currentUser: User | null;
 }
 
-function Header({ toggleMobileSidebar }: HeaderProps) {
+function Header({ toggleMobileSidebar, isSidebarCollapsed }: HeaderProps) {
   const { currentUser } = useAuth() as AuthContextType;
   
   return (
@@ -33,6 +34,11 @@ function Header({ toggleMobileSidebar }: HeaderProps) {
           <h1 className="text-xl font-bold text-gray-900">
             {currentUser?.role === 'admin' ? 'Admin Dashboard' : 'Farmer Dashboard'}
           </h1>
+
+          {/* Display sidebar state */}
+          <p className="ml-4 text-sm text-gray-600">
+            {isSidebarCollapsed ? 'Sidebar Collapsed' : ''}
+          </p>
         </div>
         
         <div className="flex items-center space-x-4">
